@@ -2,6 +2,7 @@
 
 import { Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { MainScene } from "./mainScene";
 
 export function MainCanvas() {
     return (
@@ -12,10 +13,7 @@ export function MainCanvas() {
                 camera={{ fov: 55, position: [0, 0, 6] }}
             >
                 <Environment files={"/images/purplesky.jpg"} />
-                <mesh>
-                    <boxGeometry args={[1,1,1]}/>
-                    <meshStandardMaterial color="red"/>
-                </mesh>
+                <MainScene/>
                 <OrbitControls/>
             </Canvas>
         </div>
