@@ -6,7 +6,7 @@ import { MainScene } from "./mainScene";
 
 export function MainCanvas() {
     return (
-        <div className="w-screen h-screen fixed-top top-0 left-0">
+        <div className="w-screen h-screen fixed-top top-0 left-0 fixed">
             <Canvas
                 shadows
                 dpr={[1, 2]}
@@ -14,7 +14,6 @@ export function MainCanvas() {
             >
                 <Environment files={"/images/purplesky.jpg"} />
                 <MainScene/>
-                <OrbitControls/>
             </Canvas>
         </div>
     );
