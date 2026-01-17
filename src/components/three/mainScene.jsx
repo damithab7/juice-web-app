@@ -1,65 +1,68 @@
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import { useScroll, MotionPathControls, useMotion } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+import * as THREE from 'three';
+import { generateCirclePoints } from "../utils/generateCirclePoints.js";
 
-gsap.registerPlugin(ScrollTrigger);
+function AutoMoveObject() {
+    const scroll = useScroll();
+    const motion = useMotion();
+
+    useFrame((state, delta) => {
+        motion.current += delta * 0.1
+        // console.log(scroll.offset);
+    })
+}
+
+function ScrollMoveObject() {
+    const scroll = useScroll();
+    const motion = useMotion();
+
+    useFrame((state, delta) => {
+        motion.current = scroll.offset
+        // console.log(scroll.offset);
+    })
+}
 
 export function MainScene() {
-    const can1Ref = useRef();
-    const can1SpinRef = useRef();
-    const initialPosition = [0, 0, 0];
-    const initialRotation = [0,0,0];
+    const boxRef = useRef();
 
-    useGSAP(() => {
-        const timeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: 'body',
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: true,
-                markers: true,
-            }
-        });
+    const { curve, straightLine } = useMemo(() => {
+        const start = new THREE.Vector3(0, -4, 0);
+        const end = new THREE.Vector3(0, 4, 0);
+        const straightLine = new THREE.CatmullRomCurve3([start, end], false);
 
-        timeline
-            .to(can1Ref.current.position, {
-                x: 0.5,
-                y: 0,
-                z: 3
-            })
-            .to(can1Ref.current.position, {
-                x: 0,
-                y: 0,
-                z: 0,
+        const circlePoints = generateCirclePoints(15, 2);
+        const curve = new THREE.CatmullRomCurve3(circlePoints, true);
 
-            })
-            .to(can1Ref.current.rotation, {
-                x: Math.PI / 4,
-            }, 0)
-            .to(can1Ref.current.rotation, {
-                x: 0,
-                ease: "power2.out"
-            })
-            .to(can1SpinRef.current.rotation, {
-                y: Math.PI / 4,
-            }, 0)
-            .to(can1SpinRef.current.position, {
-                y: 0,
-                ease: "power2.out"
-            })
-    })
+        return {curve, straightLine};
+    },[]);
+
+
 
     return (
         <>
-            <group ref={can1Ref} position={initialPosition} rotation={initialRotation}>
-                <group ref={can1SpinRef}>
-                    <mesh>
-                        <cylinderGeometry args={[1, 1, 3, 32, 32]} />
-                        <meshStandardMaterial color="red" />
-                    </mesh>
-                </group>
+            <MotionPathControls
+                curves={[straightLine]}
+                object={boxRef}
+                debug={true}>
+                <ScrollMoveObject />
+            </MotionPathControls>
+
+             <MotionPathControls
+                curves={[curve]}
+                focus={[0,0,0]}
+                debug={true}>
+                <AutoMoveObject />
+            </MotionPathControls>
+            
+            <group ref={boxRef}>
+                <mesh>
+                    <boxGeometry args={[1, 1, 1]} />
+                    <meshStandardMaterial color="red" />
+                </mesh>
             </group>
+
 
         </>
     );
