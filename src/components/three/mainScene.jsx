@@ -28,8 +28,8 @@ export function MainScene() {
     const boxRef = useRef();
 
     const { curve, straightLine } = useMemo(() => {
-        const start = new THREE.Vector3(0, -4, 0);
-        const end = new THREE.Vector3(0, 4, 0);
+        const start = new THREE.Vector3(0, -6, 0);
+        const end = new THREE.Vector3(0, 6, 0);
         const straightLine = new THREE.CatmullRomCurve3([start, end], false);
 
         const circlePoints = generateCirclePoints(15, 2);
